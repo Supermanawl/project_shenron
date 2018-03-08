@@ -18,6 +18,13 @@ foes = {
     "captain ginyu": {"points" : 50, "level" : 2}
 }
 
+@bot.event
+async def on_ready():
+    print("Bot Online!")
+    print("Name: {}".format(bot.user.name))
+    print("ID: {}".format(bot.user.id))
+    await bot.change_presence(game=Game(name="%s" % random.choice(games)))
+
 
 def dump(obj):
     for attr in dir(obj):
@@ -27,24 +34,21 @@ def dump(obj):
 @bot.command()
 async def fight(name):
     global exp
-    await bot.say('You will be fighting ' + name.title())
-    if bool(random.getrandbits(1)):
+    global dragon_balls_collected
+
+    if bool(random.getrandbits(1)) and dragon_balls_collected < 7:
         exp += foes[name.lower()]["points"]
         await bot.say('You have won!')
         await bot.say('Exp: ' + str(exp))
+        if exp % 100 == 0:
+            dragon_balls_collected += 1
         await bot.say('DragonBalls: ' + str(dragon_balls_collected))
+    elif dragon_balls_collected == 7:
+        await bot.say('You have acquired enough dragon balls to summon me...')
     else:
         await bot.say('You have lost!')
         await bot.say('Exp: ' + str(exp))
         await bot.say('DragonBalls: ' + str(dragon_balls_collected))
-
-
-@bot.event
-async def on_ready():
-    print("Bot Online!")
-    print("Name: {}".format(bot.user.name))
-    print("ID: {}".format(bot.user.id))
-    await bot.change_presence(game=Game(name="%s" % random.choice(games)))
 
 @bot.event
 async def on_message(message):

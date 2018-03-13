@@ -1,29 +1,25 @@
 from discord import Game
 from discord.ext.commands import Bot
 import random
+import game_library
+import enemies
+import restaurants
 import shenron_config
 
-BOT_PREFIX = "!"
+
+BOT_PREFIX = ("!", "?")
 bot = Bot(command_prefix=BOT_PREFIX)
 TOKEN = "NDE4OTMyNzAyNDExMjI3MTQ3.DXoxDQ.br6DwIJpUgdmEUJb-pe_ffcPK0A"
-games = ["on Discord Island", "NBA 2K18", "Pokémon Colosseum", "Portal 2", "Grand Theft Auto V", "Minecraft"]
+
 exp = 0
 dragon_balls_collected = 0
-foes = {
-    "frieza": {"points" : 100, "level": 5},
-    "cell": {"points" : 100, "level": 5},
-    "raditz": {"points": 10, "level" : 1},
-    "majin buu": {"points" : 80, "level" : 4},
-    "broly": {"points": 300, "level" : 5},
-    "captain ginyu": {"points" : 50, "level" : 2}
-}
 
 @bot.event
 async def on_ready():
     print("Bot Online!")
     print("Name: {}".format(bot.user.name))
     print("ID: {}".format(bot.user.id))
-    await bot.change_presence(game=Game(name="%s" % random.choice(games)))
+    await bot.change_presence(game=Game(name=random.choice(game_library.games)))
 
 
 def dump(obj):
@@ -37,7 +33,7 @@ async def fight(name):
     global dragon_balls_collected
 
     if bool(random.getrandbits(1)) and dragon_balls_collected < 7:
-        exp += foes[name.lower()]["points"]
+        exp += enemies.dragon_ball[name.lower()]["points"]
         await bot.say('You have won!')
         await bot.say('Exp: ' + str(exp))
         if exp % 100 == 0:
@@ -50,11 +46,15 @@ async def fight(name):
         await bot.say('Exp: ' + str(exp))
         await bot.say('DragonBalls: ' + str(dragon_balls_collected))
 
+@bot.command()
+async def food():
+    await bot.say('You want ' + random.choice(restaurants.ruston) + " today...")
+
+
 @bot.event
 async def on_message(message):
     # we do not want the bot to reply to itself
     global dragon_balls_collected
-    await bot.process_commands(message)
 
     if message.author == bot.user:
         return
@@ -69,6 +69,8 @@ async def on_message(message):
             dragon_balls_collected = 0
         else:
             await bot.send_message(message.channel, 'You have not proven yourself to be worthy of my power...')
+
+    await bot.process_commands(message)
 
 # Run the bot
 bot.run(shenron_config.token)

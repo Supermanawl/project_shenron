@@ -1,1 +1,1 @@
-shenron-worker: python shenron_bot.py
+worker: python shenron_bot.py

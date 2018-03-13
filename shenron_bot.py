@@ -1,6 +1,8 @@
 from discord import Game
 from discord.ext.commands import Bot
+import asyncio
 import random
+import toolkit
 import game_library
 import enemies
 import restaurants
@@ -21,12 +23,6 @@ async def on_ready():
     print("ID: {}".format(bot.user.id))
     await bot.change_presence(game=Game(name=random.choice(game_library.games)))
 
-
-def dump(obj):
-    for attr in dir(obj):
-        print("obj.%s = %r" % (attr, getattr(obj, attr)))
-
-
 @bot.command()
 async def fight(name):
     global exp
@@ -46,8 +42,8 @@ async def fight(name):
         await bot.say('Exp: ' + str(exp))
         await bot.say('DragonBalls: ' + str(dragon_balls_collected))
 
-@bot.command()
-async def food():
+@bot.command(pass_context=True)
+async def food(ctx):
     await bot.say('You want ' + random.choice(restaurants.ruston) + " today...")
 
 
@@ -60,14 +56,23 @@ async def on_message(message):
         return
     if message.content.startswith('I CALL ON THE MIGHTY SHENRON!'):
         if dragon_balls_collected == 7:
+            await bot.send_typing(message.channel)
+            await asyncio.sleep(4)
             await bot.send_message(message.channel, '{0.author.mention}, What is your wish? You will have only one!'
                                 .format(message))
             await bot.wait_for_message(author=message.author)
+            await bot.send_typing(message.channel)
+            await asyncio.sleep(4)
             await bot.send_message(message.channel, 'A simple matter... very well {0.author.mention}, I shall grant your wish'
                                  .format(message))
+
+            # This is where you will grant the wish so you'll probably need to wait a while why he fetches
+
             await bot.send_message(message.channel, 'The wish has been granted... farewell')
             dragon_balls_collected = 0
         else:
+            await bot.send_typing(message.channel)
+            await asyncio.sleep(4)
             await bot.send_message(message.channel, 'You have not proven yourself to be worthy of my power...')
 
     await bot.process_commands(message)

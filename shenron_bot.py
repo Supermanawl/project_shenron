@@ -4,7 +4,6 @@ import asyncio
 import random
 import toolkit
 import game_library
-import enemies
 import restaurants
 import shenron_config
 
@@ -29,16 +28,15 @@ async def fight(name):
     global dragon_balls_collected
 
     if bool(random.getrandbits(1)) and dragon_balls_collected < 7:
-        exp += enemies.dragon_ball[name.lower()]["points"]
-        await bot.say('You have won!')
+        exp += 100
+        await bot.say('You have defeated ' + name + '!')
         await bot.say('Exp: ' + str(exp))
-        if exp % 100 == 0:
-            dragon_balls_collected += 1
+        dragon_balls_collected += 1
         await bot.say('DragonBalls: ' + str(dragon_balls_collected))
     elif dragon_balls_collected == 7:
         await bot.say('You have acquired enough dragon balls to summon me...')
     else:
-        await bot.say('You have lost!')
+        await bot.say('You have lost to ' + name + '!')
         await bot.say('Exp: ' + str(exp))
         await bot.say('DragonBalls: ' + str(dragon_balls_collected))
 
@@ -51,6 +49,7 @@ async def food(ctx):
 async def on_message(message):
     # we do not want the bot to reply to itself
     global dragon_balls_collected
+    global exp
 
     if message.author == bot.user:
         return
@@ -70,6 +69,17 @@ async def on_message(message):
 
             await bot.send_message(message.channel, 'The wish has been granted... farewell')
             dragon_balls_collected = 0
+            exp = 0
+        elif dragon_balls_collected > 7:
+            await bot.send_typing(message.channel)
+            await asyncio.sleep(4)
+            await bot.send_message(message.channel, '...' + str(dragon_balls_collected) + '? ')
+            dragon_balls_collected = 0
+            exp = 0
+            await bot.send_typing(message.channel)
+            await asyncio.sleep(4)
+            await bot.send_message(message.channel, 'Exp: ' + str(exp))
+            await bot.send_message(message.channel, 'DragonBalls: ' + str(dragon_balls_collected))
         else:
             await bot.send_typing(message.channel)
             await asyncio.sleep(4)

@@ -6,5 +6,6 @@ ruston = [
     "El Jarrito",
     "Roma's",
     "Z-Buffet",
-    "Walmart"
+    "Walmart",
+	"Whataburger"
 ]

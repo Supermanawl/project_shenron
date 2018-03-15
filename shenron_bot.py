@@ -15,6 +15,7 @@ TOKEN = "NDE4OTMyNzAyNDExMjI3MTQ3.DXoxDQ.br6DwIJpUgdmEUJb-pe_ffcPK0A"
 exp = 0
 dragon_balls_collected = 0
 
+
 @bot.event
 async def on_ready():
     print("Bot Online!")
@@ -22,23 +23,31 @@ async def on_ready():
     print("ID: {}".format(bot.user.id))
     await bot.change_presence(game=Game(name=random.choice(game_library.games)))
 
-@bot.command()
-async def fight(name):
+
+@bot.command(pass_context=True)
+async def fight(ctx, name):
     global exp
     global dragon_balls_collected
 
     if bool(random.getrandbits(1)) and dragon_balls_collected < 7:
+        await bot.send_typing(ctx.message.channel)
+        await asyncio.sleep(1)
         exp += 100
         await bot.say('You have defeated ' + name + '!')
         await bot.say('Exp: ' + str(exp))
         dragon_balls_collected += 1
         await bot.say('DragonBalls: ' + str(dragon_balls_collected))
     elif dragon_balls_collected == 7:
+        await bot.send_typing(ctx.message.channel)
+        await asyncio.sleep(1)
         await bot.say('You have acquired enough dragon balls to summon me...')
     else:
+        await bot.send_typing(ctx.message.channel)
+        await asyncio.sleep(1)
         await bot.say('You have lost to ' + name + '!')
         await bot.say('Exp: ' + str(exp))
         await bot.say('DragonBalls: ' + str(dragon_balls_collected))
+
 
 @bot.command(pass_context=True)
 async def food(ctx):

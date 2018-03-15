@@ -42,6 +42,8 @@ async def fight(name):
 
 @bot.command(pass_context=True)
 async def food(ctx):
+    await bot.send_typing(ctx.message.channel)
+    await asyncio.sleep(2)
     await bot.say('You want ' + random.choice(restaurants.ruston) + " today...")
 
 

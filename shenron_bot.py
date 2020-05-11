@@ -6,7 +6,6 @@ import random
 import logging
 
 # Local Imports
-import toolkit
 import game_library
 import rival_library
 import shenron_config
@@ -88,8 +87,8 @@ async def on_message(message):
 				await bot.process_commands(message)
 				await dragon_type(channel, 2)
 				await channel.send('{0.author.mention}, What is your wish? You will have only one!'.format(message))
-				await bot.wait_for('message')
 				logging.info("Waiting for user input")
+				await bot.wait_for('message')
 				if bool(random.getrandbits(1)):
 					await dragon_type(channel, 1)
 					await channel.send("A simple matter...")

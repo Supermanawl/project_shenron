@@ -4,6 +4,7 @@ import asyncio
 import random
 import toolkit
 import game_library
+import rival_library
 import shenron_config
 
 
@@ -29,8 +30,11 @@ async def on_ready():
 
 # Fight whoever you'd like for a chance at a dragonball
 @bot.command(pass_context=True)
-async def fight(ctx, name):
+async def fight(ctx, name=None):
 	global dragon_balls_collected
+	if name == None:
+		name = random.choice(rival_library.rivals)
+
 	if bool(random.getrandbits(1)) and dragon_balls_collected < 7:
 		await dragon_type(ctx, 1)
 		await ctx.send('You have defeated ' + name + '!')

@@ -1,5 +1,7 @@
 # Pip Install Imports
-from discord import Game
+from discord import Game, Spotify
+from discord import Activity, ActivityType
+from discord.ext import tasks
 from discord.ext.commands import Bot
 import asyncio
 import random
@@ -10,6 +12,7 @@ import game_library
 import rival_library
 import shenron_config
 
+# Logging Format
 logging.basicConfig(format='%(asctime)s %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p', level=logging.INFO)
 
 # Command Prefixes
@@ -18,11 +21,23 @@ bot = Bot(command_prefix=BOT_PREFIX)
 
 dragon_balls_collected = 0
 
+# List of Activities
+game = Game(name=random.choice(game_library.games))
+spotify = Activity(name='Spotify', type=ActivityType.listening)
+netflix = Activity(name='Netflix', type=ActivityType.watching)
+hulu = Activity(name='Hulu', type=ActivityType.watching)
+activities = [game, spotify, netflix, hulu]
+
+
 # Show Shenron typing...
 async def dragon_type(ctx, seconds):
 	async with ctx.typing():
 		await asyncio.sleep(seconds)
 
+# Change activity on an interval
+@tasks.loop(seconds=7, minutes=7, hours=7)
+async def change_activity():
+    await bot.change_presence(activity=activities[random.randrange(4)])
 
 # Print bot info to console
 @bot.event
@@ -30,7 +45,7 @@ async def on_ready():
     logging.info("Bot Online!")
     logging.info("Name: {}".format(bot.user.name))
     logging.info("ID: {}".format(bot.user.id))
-    await bot.change_presence(activity=Game(name=random.choice(game_library.games)))
+    change_activity.start()
 
 
 # Fight whoever you'd like for a chance at a dragonball
@@ -73,9 +88,9 @@ async def fight(ctx, name=None):
 @bot.event
 async def on_message(message):
 	global dragon_balls_collected
-	canGrantWish = False
 	channel = message.channel
 	caller = str(message.author)
+	canGrantWish = False
 
 	if message.author == bot.user:
 		return
@@ -118,6 +133,9 @@ async def on_message(message):
 	await bot.process_commands(message)
 
 
+if __name__ == "__main__":
+	# Run the bot
+	bot.run(shenron_config.token)
 
-# Run the bot
-bot.run(shenron_config.token)
+
+
